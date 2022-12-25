@@ -8,6 +8,9 @@ import { SubCategoriesModule } from './sub-categories/sub-categories.module';
 import { AdminsModule } from './admins/admins.module';
 import { ConfigModule } from '@nestjs/config';
 import { Events } from './events/events.entity';
+import { Categories } from './categories/categories.entity';
+import { SubCategories } from './sub-categories/sub-categories.entity';
+import { Admin } from './admins/admin.entity';
 
 @Module({
   imports: [
@@ -19,7 +22,7 @@ import { Events } from './events/events.entity';
       password: process.env.PG_PASSWORD,
       database: process.env.PG_DATABASE,
       port: parseInt(process.env.PG_PORT),
-      entities: [Events],
+      entities: [Events, Categories, SubCategories, Admin],
       synchronize: true,
     }),
     EventsModule,
