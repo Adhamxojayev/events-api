@@ -17,13 +17,16 @@ export class EventsService {
     return this.eventRepo.save(event);
   }
 
-  async findOne(eventId: number) {
-    const event = await this.eventRepo.findOneBy({ eventId });
-    console.log(event);
+  async delete(id: number) {
+    const event = await this.findOne(id);
     if (!event) {
       return new NotFoundException('event not found');
     }
+    return this.eventRepo.softDelete(id);
+  }
 
+  async findOne(eventId: number) {
+    const event = await this.eventRepo.findOneBy({ eventId });
     return event;
   }
 }

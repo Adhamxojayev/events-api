@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CreateEventsDto } from './dtos/create-events.dto';
 import { EventsService } from './events.service';
 
@@ -19,5 +19,10 @@ export class EventsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.eventService.findOne(parseInt(id));
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return this.eventService.delete(parseInt(id));
   }
 }

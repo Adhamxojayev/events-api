@@ -1,9 +1,11 @@
+import { Categories } from 'src/categories/categories.entity';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -16,6 +18,12 @@ export class SubCategories extends BaseEntity {
   @Column({ type: 'varchar' })
   subCategoryName: string;
 
+  @ManyToOne(
+    () => Categories,
+    (categories: Categories) => categories.subCategory,
+  )
+  category: Categories;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
@@ -24,4 +32,5 @@ export class SubCategories extends BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
+  categoryCategoryId: number;
 }

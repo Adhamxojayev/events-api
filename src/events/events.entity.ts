@@ -70,5 +70,5 @@ export class Events extends BaseEntity {
   updatedAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp' })
-  deletedAt: Date;
+  deletedAt?: Date;
 }
