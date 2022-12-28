@@ -9,11 +9,32 @@ import { SubCategories } from './sub-categories.entity';
 export class SubCategoriesService {
   constructor(
     @InjectRepository(SubCategories)
-    public subCategoryRepo: Repository<SubCategories>,
+    private subCategoryRepo: Repository<SubCategories>,
   ) {}
 
   findAll() {
-    return this.subCategoryRepo.find();
+    return this.subCategoryRepo.find({
+      relations: {
+        events: true,
+      },
+      select: {
+        subCategoryId: true,
+        subCategoryName: true,
+        events: {
+          eventId: true,
+          eventDate: true,
+          eventHour: true,
+          organizerName: true,
+          organizerProfes: true,
+          organizerTel: true,
+          eventDescription: true,
+          eventImage: true,
+          eventBody: true,
+          eventLink: true,
+          eventType: true,
+        },
+      },
+    });
   }
 
   async create(body: CreateSubCategoryDto) {
@@ -23,5 +44,31 @@ export class SubCategoriesService {
     const data = this.subCategoryRepo.create(body);
     data.category = categories;
     return await this.subCategoryRepo.save(data);
+  }
+
+  find(id: number) {
+    return this.subCategoryRepo.findOne({
+      where: { subCategoryId: id },
+      relations: {
+        events: true,
+      },
+      select: {
+        subCategoryId: true,
+        subCategoryName: true,
+        events: {
+          eventId: true,
+          eventDate: true,
+          eventHour: true,
+          organizerName: true,
+          organizerProfes: true,
+          organizerTel: true,
+          eventDescription: true,
+          eventImage: true,
+          eventBody: true,
+          eventLink: true,
+          eventType: true,
+        },
+      },
+    });
   }
 }

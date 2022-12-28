@@ -14,6 +14,14 @@ export class CategoriesService {
       relations: {
         subCategory: true,
       },
+      select: {
+        categoryId: true,
+        categoryName: true,
+        subCategory: {
+          subCategoryId: true,
+          subCategoryName: true,
+        },
+      },
     });
   }
 
@@ -21,5 +29,22 @@ export class CategoriesService {
     const data = this.categoriesRepo.create(body);
 
     return this.categoriesRepo.save(data);
+  }
+
+  async find(id: number) {
+    const category = await this.categoriesRepo.findOne({
+      where: { categoryId: id },
+      relations: { subCategory: true },
+      select: {
+        categoryId: true,
+        categoryName: true,
+        subCategory: {
+          subCategoryId: true,
+          subCategoryName: true,
+        },
+      },
+    });
+
+    return category;
   }
 }

@@ -4,7 +4,7 @@ import { EventsService } from './events.service';
 
 @Controller('events')
 export class EventsController {
-  constructor(public eventService: EventsService) {}
+  constructor(private eventService: EventsService) {}
 
   @Get()
   findAll() {

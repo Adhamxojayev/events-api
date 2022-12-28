@@ -1,4 +1,5 @@
 import { Categories } from 'src/categories/categories.entity';
+import { Events } from 'src/events/events.entity';
 import {
   BaseEntity,
   Column,
@@ -6,6 +7,7 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -24,13 +26,16 @@ export class SubCategories extends BaseEntity {
   )
   category: Categories;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @OneToMany(() => Events, (event: Events) => event.subCategory)
+  events: Events[];
+
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt: Date;
   categoryCategoryId: number;
 }

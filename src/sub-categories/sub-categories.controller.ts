@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CreateSubCategoryDto } from './dto/sub-category.dto';
 import { SubCategoriesService } from './sub-categories.service';
 
@@ -14,5 +14,10 @@ export class SubCategoriesController {
   @Post()
   create(@Body() body: CreateSubCategoryDto) {
     return this.subCategoryService.create(body);
+  }
+
+  @Get(':id')
+  find(@Param('id') id: string) {
+    return this.subCategoryService.find(parseInt(id));
   }
 }

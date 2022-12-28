@@ -1,3 +1,4 @@
+import { SubCategories } from 'src/sub-categories/sub-categories.entity';
 import {
   BaseEntity,
   Column,
@@ -6,18 +7,19 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
-enum EventsType {
-  online = 'online',
-  offline = 'offline',
-}
+// enum EventsType {
+//   online = 'online',
+//   offline = 'offline',
+// }
 
-enum StatusType {
-  confirmation = 'confirmation',
-  cancellation = 'cancellation',
-  default = 'null',
-}
+// enum StatusType {
+//   confirmation = 'confirmation',
+//   cancellation = 'cancellation',
+//   default = 'null',
+// }
 
 @Entity('events')
 export class Events extends BaseEntity {
@@ -25,16 +27,16 @@ export class Events extends BaseEntity {
   eventId: number;
 
   @Column({ type: 'date' })
-  eventDate: string;
+  eventDate: Date;
 
   @Column({ type: 'varchar', length: 5 })
   eventHour: string;
 
-  @Column({ type: 'enum', enum: EventsType, default: EventsType.online })
-  eventType: EventsType;
+  @Column({ type: 'varchar', default: 'online' })
+  eventType: string;
 
-  @Column({ type: 'enum', enum: StatusType, default: StatusType.default })
-  eventStatus: StatusType;
+  @Column({ type: 'varchar', default: 'null' })
+  eventStatus: string;
 
   @Column({ type: 'varchar' })
   eventLink: string;
@@ -57,18 +59,18 @@ export class Events extends BaseEntity {
   @Column({ type: 'text' })
   eventBody: string;
 
-  @Column({ type: 'varchar' })
-  categories: string;
+  @ManyToOne(
+    () => SubCategories,
+    (subCategories: SubCategories) => subCategories.events,
+  )
+  subCategory: SubCategories;
 
-  @Column({ type: 'varchar' })
-  subCategories: string;
-
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 
-  @DeleteDateColumn({ type: 'timestamp' })
+  @DeleteDateColumn({ type: 'timestamptz' })
   deletedAt?: Date;
 }

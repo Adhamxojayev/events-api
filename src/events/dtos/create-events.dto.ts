@@ -1,5 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsDate, IsNotEmpty, IsString, MinDate } from 'class-validator';
+import {
+  IsDate,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinDate,
+} from 'class-validator';
 
 export class CreateEventsDto {
   @IsNotEmpty()
@@ -12,6 +19,7 @@ export class CreateEventsDto {
   eventHour: string;
 
   @IsString()
+  @IsOptional()
   eventType: string;
 
   @IsString()
@@ -35,9 +43,6 @@ export class CreateEventsDto {
   @IsString()
   eventBody: string;
 
-  @IsString()
-  categories: string;
-
-  @IsString()
-  subCategories: string;
+  @IsNumber()
+  subCategorySubCategoryId: number;
 }
