@@ -3,47 +3,67 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Admin } from './admin.entity';
 import { randomBytes, scrypt as _scrypt } from 'crypto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateAdminDto } from './dto/admin.dto';
+import { JwtService } from '@nestjs/jwt';
+import { Admin } from './admin.entity';
+import { Repository } from 'typeorm';
 import { promisify } from 'util';
 
 const scrypt = promisify(_scrypt);
-import { CreateAdminDto } from './dto/admin.dto';
 
 @Injectable()
 export class AdminsService {
-  constructor(@InjectRepository(Admin) public adminRepo: Repository<Admin>) {}
+  constructor(
+    @InjectRepository(Admin) public adminRepo: Repository<Admin>,
+    private jwt: JwtService,
+  ) {}
 
   async signup(body: CreateAdminDto) {
+    const username = await this.findOneAdmin(body.username);
+    if (username) {
+      return new BadRequestException('such a username exists');
+    }
+
     const salt = randomBytes(8).toString('hex');
     const hash = (await scrypt(body.password, salt, 32)) as Buffer;
     body.password = salt + '.' + hash.toString('hex');
 
     const user = this.adminRepo.create(body);
-    this.adminRepo.save(user);
+    await this.adminRepo.save(user);
     delete user.password;
     return { status: 201, message: 'ok', data: user };
   }
 
   async signin(body: CreateAdminDto) {
-    const [user] = await this.adminRepo
-      .createQueryBuilder()
-      .select('*')
-      .where('username = :username', { username: body.username })
-      .getRawMany();
+    const user = await this.findOneAdmin(body.username);
     if (!user) {
-      throw new NotFoundException('user not found');
+      return new NotFoundException('user not found');
     }
+
     const [salt, hashed] = user.password.split('.');
 
     const hash = (await scrypt(body.password, salt, 32)) as Buffer;
 
     if (hashed !== hash.toString('hex')) {
-      throw new BadRequestException('bad password');
+      return new BadRequestException('bad password');
     }
     delete user.password;
-    return { status: 201, message: 'ok', data: user };
+    return {
+      status: 200,
+      message: 'ok',
+      data: user,
+      access_token: this.jwt.sign({ adminId: user.adminId }),
+    };
+  }
+
+  async findOneAdmin(username: string) {
+    const [user] = await this.adminRepo
+      .createQueryBuilder()
+      .select('*')
+      .where('username = :username', { username: username })
+      .getRawMany();
+    return user;
   }
 }

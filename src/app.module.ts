@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,6 +16,7 @@ import { Events } from './events/events.entity';
 import { Categories } from './categories/categories.entity';
 import { SubCategories } from './sub-categories/sub-categories.entity';
 import { Admin } from './admins/admin.entity';
+import { CheckTokenMiddleware } from './middlewares/check-token';
 
 @Module({
   imports: [
@@ -33,4 +39,10 @@ import { Admin } from './admins/admin.entity';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CheckTokenMiddleware)
+      .forRoutes({ path: 'events', method: RequestMethod.ALL });
+  }
+}

@@ -12,7 +12,9 @@ export class CategoriesService {
   findAll() {
     return this.categoriesRepo.find({
       relations: {
-        subCategory: true,
+        subCategory: {
+          events: true,
+        },
       },
       select: {
         categoryId: true,
@@ -20,6 +22,19 @@ export class CategoriesService {
         subCategory: {
           subCategoryId: true,
           subCategoryName: true,
+          events: {
+            eventId: true,
+            eventDate: true,
+            eventHour: true,
+            organizerName: true,
+            organizerProfes: true,
+            organizerTel: true,
+            eventDescription: true,
+            eventImage: true,
+            eventBody: true,
+            eventLink: true,
+            eventType: true,
+          },
         },
       },
     });
