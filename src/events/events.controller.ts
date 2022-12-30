@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { resolve } from 'path';
 import { CreateEventsDto } from './dtos/create-events.dto';
 import { EventsService } from './events.service';
 
@@ -11,10 +23,27 @@ export class EventsController {
     return this.eventService.findAll();
   }
 
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: resolve('uploads'),
+        filename: (req, file, cb) => {
+          const fileNameSplit = file.originalname.split('.');
+          const fileExt = fileNameSplit[fileNameSplit.length - 1];
+          cb(null, `${Date.now()}.${fileExt}`);
+        },
+      }),
+    }),
+  )
   @Post()
-  create(@Body() body: CreateEventsDto) {
-    return this.eventService.create(body);
+  create(@UploadedFile() file: Express.Multer.File, @Body() body: any) {
+    return { file: file, body: body };
   }
+
+  // @Post()
+  // create(@Body() body: CreateEventsDto) {
+  //   return this.eventService.create(body);
+  // }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
