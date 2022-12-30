@@ -1,15 +1,17 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
   Param,
   Post,
+  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { CreateEventsDto } from './dtos/create-events.dto';
 import { EventsService } from './events.service';
@@ -23,27 +25,24 @@ export class EventsController {
     return this.eventService.findAll();
   }
 
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: resolve('uploads'),
-        filename: (req, file, cb) => {
-          const fileNameSplit = file.originalname.split('.');
-          const fileExt = fileNameSplit[fileNameSplit.length - 1];
-          cb(null, `${Date.now()}.${fileExt}`);
-        },
-      }),
-    }),
-  )
   @Post()
-  create(@UploadedFile() file: Express.Multer.File, @Body() body: any) {
-    return { file: file, body: body };
+  @UseInterceptors(FileInterceptor('file'))
+  create(@Body() body: any, @UploadedFile() file: Express.Multer.File) {
+    const { mimetype } = file;
+    const fileName = Date.now() + file.originalname;
+    if (!['image/png', 'image/jpeg', 'image/jpg'].includes(mimetype)) {
+      return new BadRequestException('file type invalid');
+    } else {
+      writeFileSync(resolve('uploads', fileName), file.buffer);
+      body.eventImage = fileName;
+      return this.eventService.create(body);
+    }
   }
 
-  // @Post()
-  // create(@Body() body: CreateEventsDto) {
-  //   return this.eventService.create(body);
-  // }
+  @Get(':filename')
+  sendImageEvents(@Param('filename') filename: any, @Res() res) {
+    return res.sendFile(resolve('uploads', filename));
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {

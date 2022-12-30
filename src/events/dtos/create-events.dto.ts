@@ -1,7 +1,6 @@
 import { Transform } from 'class-transformer';
 import {
   IsDate,
-  IsMimeType,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -38,7 +37,8 @@ export class CreateEventsDto {
   @IsString()
   eventDescription: string;
 
-  @IsMimeType()
+  @IsString()
+  @IsOptional()
   eventImage: string;
 
   @IsString()
