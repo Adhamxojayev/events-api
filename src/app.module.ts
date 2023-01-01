@@ -27,7 +27,6 @@ import { CheckTokenMiddleware } from './middlewares/check-token';
       host: process.env.PG_HOST,
       password: process.env.PG_PASSWORD,
       database: process.env.PG_DATABASE,
-      // port: parseInt(process.env.PG_PORT),
       entities: [Events, Categories, SubCategories, Admin],
       synchronize: true,
     }),
