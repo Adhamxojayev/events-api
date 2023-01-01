@@ -20,14 +20,14 @@ import { CheckTokenMiddleware } from './middlewares/check-token';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ envFilePath: '.development.env' }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       username: process.env.PG_USER,
       host: process.env.PG_HOST,
       password: process.env.PG_PASSWORD,
       database: process.env.PG_DATABASE,
-      port: parseInt(process.env.PG_PORT),
+      // port: parseInt(process.env.PG_PORT),
       entities: [Events, Categories, SubCategories, Admin],
       synchronize: true,
     }),
@@ -43,6 +43,10 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(CheckTokenMiddleware)
-      .forRoutes({ path: 'events', method: RequestMethod.ALL });
+      .forRoutes(
+        { path: 'events/admin/:id', method: RequestMethod.PATCH },
+        { path: 'events/admin/:id', method: RequestMethod.DELETE },
+        { path: 'events/admin/all', method: RequestMethod.GET },
+      );
   }
 }

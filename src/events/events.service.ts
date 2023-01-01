@@ -32,11 +32,25 @@ export class EventsService {
     return this.eventRepo.softDelete(id);
   }
 
+  async update(id: number, status: string) {
+    const events = await this.eventRepo.findOneBy({ eventId: id });
+    if (!events) {
+      return new NotFoundException('event not found');
+    } else {
+      events.eventStatus = status;
+      return this.eventRepo.save(events);
+    }
+  }
+
   async findOne(eventId: number) {
     const event = await this.eventRepo.findOneBy({
       eventId,
       eventStatus: 'confirmation',
     });
     return event;
+  }
+
+  async findAllAdmin() {
+    return this.eventRepo.find();
   }
 }
